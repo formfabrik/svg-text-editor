@@ -176,7 +176,7 @@ export class SvgTextEditor {
     this.refresh();
   }
 
-  startEditing() {
+  startEditing({ focus = true } = {}) {
     if (this.editing) return;
     this.editing = true;
     this.hit.setAttribute('pointer-events', 'all');
@@ -199,15 +199,15 @@ export class SvgTextEditor {
     this._on(ta, 'copy', (e) => this._copy(e, false));
     this._on(ta, 'cut', (e) => this._copy(e, true));
     this._on(ta, 'paste', (e) => this._paste(e));
-    this._on(ta, 'focus', () => this.o.onFocus(this));
-    this._on(ta, 'blur', () => this.o.onBlur(this));
+    this._on(ta, 'focus', (e) => this.o.onFocus(this, e));
+    this._on(ta, 'blur', (e) => this.o.onBlur(this, e));
     this._on(this.g, 'pointerdown', (e) => this._down(e));
     this._on(this.g, 'mousedown', (e) => e.preventDefault()); // Fokus nicht verlieren
 
     this._blink = this.caret.animate
       ? this.caret.animate([{ opacity: 1 }, { opacity: 1, offset: 0.5 }, { opacity: 0, offset: 0.5001 }, { opacity: 0 }], { duration: 1060, iterations: Infinity })
       : null;
-    ta.focus({ preventScroll: true });
+    if (focus) ta.focus({ preventScroll: true });
     this._update();
   }
 

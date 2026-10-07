@@ -26,8 +26,9 @@ const props = defineProps({
   lineHeight: { type: Number, default: 1.25 },
   align: { type: String, default: 'left' },
   editing: { type: Boolean, default: false },
+  autofocus: { type: Boolean, default: true },
 });
-const emit = defineEmits(['update:modelValue', 'selection', 'blur', 'escape']);
+const emit = defineEmits(['update:modelValue', 'selection', 'focus', 'blur', 'escape']);
 
 const root = ref(null);
 let ed = null;
@@ -44,10 +45,11 @@ onMounted(() => {
     runs: props.modelValue,
     onChange: (runs) => { lastEmitted = runs; emit('update:modelValue', runs); },
     onSelection: (s) => emit('selection', s),
-    onBlur: () => emit('blur'),
+    onFocus: () => emit('focus'),
+    onBlur: (instance, event) => emit('blur', event),
     onEscape: () => emit('escape'),
   });
-  if (props.editing) ed.startEditing();
+  if (props.editing) ed.startEditing({ focus: props.autofocus });
 });
 
 onBeforeUnmount(() => ed && ed.destroy());

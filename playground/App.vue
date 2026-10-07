@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { SvgRichText } from '../src/vue/index.js';
+import { SvgRichText, SvgRichTextEditor } from '../src/vue/index.js';
 
 const editor = ref(null);
 const svg = ref(null);
@@ -9,6 +9,10 @@ const editorWidth = ref(500);
 const resizing = ref(false);
 const selection = ref({ start: 0, end: 0, format: {} });
 const layoutSnapshot = ref(null);
+const moduleRuns = ref([
+  { text: 'Klicke in diesen Editor. ' },
+  { text: 'Die Palette erscheint automatisch.', bold: true },
+]);
 const runs = ref([
   { text: 'Hallo ' },
   { text: 'SVG', bold: true, fill: '#2563eb' },
@@ -213,5 +217,19 @@ function resizeWithKeyboard(event) {
       Setze den Fokus außerhalb des Editors, um den Snapshot zu erzeugen.
     </p>
     <pre v-else>{{ JSON.stringify(layoutSnapshot, null, 2) }}</pre>
+
+    <h2>Einbettbare Vue-Komponente</h2>
+    <SvgRichTextEditor
+      v-model="moduleRuns"
+      :width="700"
+      :height="220"
+      :font-size="20"
+      toolbar="floating"
+      :font-options="[
+        { label: 'Roboto', value: 'Roboto' },
+        { label: 'Lora', value: 'Lora' },
+        { label: 'Noto Sans', value: 'Noto Sans' },
+      ]"
+    />
   </main>
 </template>
