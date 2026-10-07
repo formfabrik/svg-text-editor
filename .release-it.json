@@ -6,7 +6,7 @@
     ]
   },
   "git": {
-    "commitMessage": "chore: release v${version}",
+    "commitMessage": "chore: release v${version}\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
     "tagName": "v${version}",
     "requireCleanWorkingDir": true,
     "push": true
