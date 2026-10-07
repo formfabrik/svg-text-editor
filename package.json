@@ -41,7 +41,7 @@
   "description": "SVG rich text editor built with Vue and Vite",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.picserver.info:33322/formfabrik/svg-text-editor.git"
+    "url": "git+https://github.com/formfabrik/svg-text-editor.git"
   },
   "publishConfig": {
     "access": "public"
