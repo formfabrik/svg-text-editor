@@ -23,6 +23,7 @@
     "build:demo": "vite build --outDir dist-playground",
     "build:lib": "vite build --config vite.lib.config.js",
     "preview": "vite preview --outDir dist-playground",
+    "release": "release-it",
     "release:beta": "release-it 1.0.0-beta.1",
     "release:beta:dry": "release-it 1.0.0-beta.1 --dry-run",
     "test": "vitest run",
