@@ -26,15 +26,18 @@ const runs = ref([
   { text: 'Editable ' },
   { text: 'SVG text', bold: true, fill: '#2563eb' },
 ]);
+const align = ref('left');
 </script>
 
 <template>
   <SvgRichTextEditor
     v-model="runs"
+    v-model:align="align"
     :width="700"
     :height="260"
     :font-size="22"
     toolbar="floating"
+    :toolbar-min-width="160"
   />
 </template>
 ```
@@ -44,6 +47,16 @@ const runs = ref([
 - `floating`: appears inside the editor after it receives focus
 - `inline`: stays above the SVG
 - `none`: renders only the editor
+
+The floating toolbar is positioned at the top-left of the editor and remains on
+one line. Its maximum width follows the editor width. `toolbarMinWidth`
+configures the minimum width retained when the editor becomes narrower.
+
+`v-model:align` controls the alignment of the complete text box and accepts
+`left`, `center` or `right`.
+
+`fontSizeOptions` configures the sizes shown in the toolbar. The default is
+`[8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 64, 72]`.
 
 Custom font choices can be supplied without bundling fonts into the library:
 
@@ -78,6 +91,7 @@ const selection = ref({ format: { mixed: {} } });
     :format="selection.format"
     @toggle="editor.toggle($event)"
     @color="editor.format({ fill: $event })"
+    @size="editor.format({ size: $event })"
   />
   <svg viewBox="0 0 800 300">
     <SvgRichText

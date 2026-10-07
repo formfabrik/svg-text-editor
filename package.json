@@ -47,7 +47,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "vue": "^3.5.0"
+    "vue": "^3.4.0"
   },
   "devDependencies": {
     "@fontsource/caveat": "^5.3.0",

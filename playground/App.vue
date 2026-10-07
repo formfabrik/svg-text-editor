@@ -13,6 +13,7 @@ const moduleRuns = ref([
   { text: 'Klicke in diesen Editor. ' },
   { text: 'Die Palette erscheint automatisch.', bold: true },
 ]);
+const moduleAlign = ref('left');
 const runs = ref([
   { text: 'Hallo ' },
   { text: 'SVG', bold: true, fill: '#2563eb' },
@@ -221,6 +222,7 @@ function resizeWithKeyboard(event) {
     <h2>Einbettbare Vue-Komponente</h2>
     <SvgRichTextEditor
       v-model="moduleRuns"
+      v-model:align="moduleAlign"
       :width="700"
       :height="220"
       :font-size="20"

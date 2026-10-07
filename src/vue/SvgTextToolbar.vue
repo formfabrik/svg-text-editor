@@ -1,6 +1,13 @@
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
   format: { type: Object, default: () => ({ mixed: {} }) },
+  align: {
+    type: String,
+    default: 'left',
+    validator: (value) => ['left', 'center', 'right'].includes(value),
+  },
   fontOptions: {
     type: Array,
     default: () => [
@@ -9,15 +16,39 @@ const props = defineProps({
       { label: 'Monospace', value: 'monospace' },
     ],
   },
+  fontSizeOptions: {
+    type: Array,
+    default: () => [8, 10, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 48, 64, 72],
+  },
 });
 
-defineEmits(['toggle', 'color', 'font']);
+const emit = defineEmits(['toggle', 'color', 'font', 'size', 'align']);
 
 const isMixed = (property) => !!props.format.mixed?.[property];
 const isActive = (property) => !isMixed(property) && !!props.format[property];
 const optionLabel = (option) => typeof option === 'string' ? option : option.label;
 const optionValue = (option) => typeof option === 'string' ? option : option.value;
 const color = () => /^#[0-9a-f]{6}$/i.test(props.format.fill) ? props.format.fill : '#000000';
+const displayedFontOptions = computed(() => {
+  const options = [...props.fontOptions];
+  const family = props.format.family;
+  if (family && !options.some((option) => optionValue(option) === family)) {
+    options.unshift({ label: family, value: family });
+  }
+  return options;
+});
+const displayedFontSizeOptions = computed(() => {
+  const sizes = props.fontSizeOptions.map(Number).filter((size) => Number.isFinite(size) && size > 0);
+  const currentSize = Number(props.format.size);
+  if (Number.isFinite(currentSize) && currentSize > 0 && !sizes.includes(currentSize)) {
+    sizes.push(currentSize);
+  }
+  return [...new Set(sizes)].sort((a, b) => a - b);
+});
+
+function setSize(event) {
+  if (event.target.value) emit('size', Number(event.target.value));
+}
 </script>
 
 <template>
@@ -49,6 +80,24 @@ const color = () => /^#[0-9a-f]{6}$/i.test(props.format.fill) ? props.format.fil
     >
       <u>U</u>
     </button>
+    <span class="svg-rte-align-group">
+      <button
+        v-for="value in ['left', 'center', 'right']"
+        :key="value"
+        type="button"
+        :title="{ left: 'Linksbündig', center: 'Zentriert', right: 'Rechtsbündig' }[value]"
+        :class="{ active: align === value }"
+        :aria-label="{ left: 'Linksbündig', center: 'Zentriert', right: 'Rechtsbündig' }[value]"
+        :aria-pressed="align === value"
+        @mousedown.prevent="$emit('align', value)"
+      >
+        <span class="svg-rte-align-icon" :class="`align-${value}`" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+      </button>
+    </span>
     <label :class="{ mixed: isMixed('fill') }">
       <span class="sr-only">Textfarbe</span>
       <input
@@ -66,11 +115,24 @@ const color = () => /^#[0-9a-f]{6}$/i.test(props.format.fill) ? props.format.fil
         @change="$emit('font', $event.target.value)"
       >
         <option
-          v-for="option in fontOptions"
+          v-for="option in displayedFontOptions"
           :key="optionValue(option)"
           :value="optionValue(option)"
         >
           {{ optionLabel(option) }}
+        </option>
+      </select>
+    </label>
+    <label v-if="fontSizeOptions.length" :class="{ mixed: isMixed('size') }">
+      <span class="sr-only">Schriftgröße</span>
+      <select
+        :value="isMixed('size') ? '' : format.size"
+        aria-label="Schriftgröße"
+        @change="setSize"
+      >
+        <option v-if="isMixed('size')" value="">–</option>
+        <option v-for="size in displayedFontSizeOptions" :key="size" :value="size">
+          {{ size }} px
         </option>
       </select>
     </label>
@@ -81,12 +143,14 @@ const color = () => /^#[0-9a-f]{6}$/i.test(props.format.fill) ? props.format.fil
 <style scoped>
 .svg-rte-toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   align-items: center;
-  width: max-content;
-  max-width: calc(100% - 16px);
+  width: 100%;
+  max-width: 100%;
   padding: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   color: #172033;
@@ -96,10 +160,48 @@ const color = () => /^#[0-9a-f]{6}$/i.test(props.format.fill) ? props.format.fil
 
 button,
 label {
+  flex: 0 0 auto;
   min-height: 32px;
   border: 1px solid #cbd5e1;
   border-radius: 5px;
   background: #fff;
+}
+
+.svg-rte-align-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 3px;
+}
+
+.svg-rte-align-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 16px;
+}
+
+.svg-rte-align-icon i {
+  display: block;
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.svg-rte-align-icon i:nth-child(2) {
+  width: 11px;
+}
+
+.svg-rte-align-icon.align-left {
+  align-items: flex-start;
+}
+
+.svg-rte-align-icon.align-center {
+  align-items: center;
+}
+
+.svg-rte-align-icon.align-right {
+  align-items: flex-end;
 }
 
 button {
