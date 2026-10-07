@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>SvgTextEditor Demo</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 20px; }
+  #bar { display: flex; gap: 6px; align-items: center; }
+  button { min-width: 2.2em; }
+  svg { border: 1px solid #bbb; background: #fff; display: block; margin-top: 10px; }
+  pre { font-size: 12px; max-height: 200px; overflow: auto; }
+</style>
+<div id="bar">
+  <button data-p="bold"><b>B</b></button>
+  <button data-p="italic"><i>I</i></button>
+  <button data-p="underline"><u>U</u></button>
+  <input type="color" id="col" value="#d93025">
+  <select id="al"><option>left</option><option>center</option><option>right</option></select>
+  <button id="done">Fertig (commit)</button>
+</div>
+<svg id="s" width="640" height="320" viewBox="0 0 640 320"></svg>
+<pre id="out"></pre>
+
+<script type="module">
+  import { SvgTextEditor } from './src/index.js';
+  const $ = (id) => document.getElementById(id);
+  const ed = new SvgTextEditor($('s'), {
+    x: 40, y: 40, width: 360, fontSize: 20, fontFamily: 'Georgia, serif', editing: true,
+    runs: [
+      { text: 'Hallo ' }, { text: 'SVG', bold: true, fill: '#1a73e8' },
+      { text: '-Editor! Dieser Fließtext bricht automatisch um. Markieren, formatieren und mit Strg+Z zurücknehmen funktioniert.' },
+    ],
+    onChange: (r) => { $('out').textContent = JSON.stringify(r, null, 1); },
+  });
+  document.querySelectorAll('[data-p]').forEach((b) => (b.onclick = () => ed.toggle(b.dataset.p)));
+  $('bar').addEventListener('mousedown', (e) => { if (!['INPUT', 'SELECT'].includes(e.target.tagName)) e.preventDefault(); });
+  $('col').oninput = (e) => { ed.format({ fill: e.target.value }); ed.focus(); };
+  $('al').onchange = (e) => { ed.setOptions({ align: e.target.value }); ed.focus(); };
+  $('done').onclick = () => { const r = ed.commit(); $('out').textContent = JSON.stringify(r.runs, null, 1); };
+</script>
