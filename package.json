@@ -38,7 +38,7 @@
     "wysiwyg"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "description": "SVG rich text editor built with Vue and Vite",
   "repository": {
     "type": "git",
